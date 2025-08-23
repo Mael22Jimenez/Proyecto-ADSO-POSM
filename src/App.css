@@ -1,0 +1,122 @@
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #e5e5c9 50%, #4a6a4a 50%); 
+}
+
+.carousel-inner,
+.carousel-item,
+.carousel-item img,
+.carousel-image {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  object-fit: cover;
+}
+
+
+.fondo-personalizado {
+  background-color: #FFFDD0; 
+  min-height: 100vh; 
+  padding: 20px;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+.navbar {
+  z-index: 1000;
+}
+
+
+.carousel-container {
+  margin-top: 10px;
+  height: calc(100vh - 10px);
+  overflow: hidden;
+  position: relative;
+}
+
+.carousel-image {
+  object-fit: cover;
+  height: 100%;
+}
+
+.navbar-custom {
+  background-color: #1B2E0C;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.navbar-custom .nav-link,
+.navbar-custom .navbar-brand {
+  color: #000000;
+}
+
+.navbar-custom .nav-link:hover {
+  color: #B6652C; 
+  text-decoration: underline;
+}
+
+.navbar-toggler {
+  background-color: #552902; 
+}
+
+.reusable-button {
+  background-color: #B6652C;
+  color: #FFFDD0;
+  border-radius: 6px;
+  margin: 10px;
+  padding: 14px 30px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border: 1px solid black;
+  margin-top: -10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  text-transform: uppercase;
+  align-self: center;
+  min-width: 100px;
+  text-decoration: none;
+}
+
+.reusable-button:hover {
+  color: #f9d498;
+}
+
+.login-title {
+  font-size: 36px;
+  color: #FFFDD0;
+  font-weight: bold;
+  margin-right: 60px;
+  margin-bottom: 5px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-decoration: none; 
+}
+
+.login-title:hover {
+  color: #FFFDD0;
+}
+
+.gestion-prod{
+  background-color: #556B2F;
+    min-height: 100%;
+    max-width: 100%;
+    width: 100%;
+    color: #FFFDD0;
+    font-family: Arial, sans-serif;
+    padding: 5px 20px 20px 20px;
+    position: relative;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    flex: 1;
+}

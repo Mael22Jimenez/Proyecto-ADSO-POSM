@@ -1,0 +1,128 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: #556B2F !important; 
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.dashboard {
+    background-color: #556B2F;
+    min-height: 100%;
+    max-width: 100%;
+    width: 100%;
+    color: #FFFDD0;
+    font-family: Arial, sans-serif;
+    padding: 5px 20px 20px 20px;
+    position: relative;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    flex: 1;
+  }
+
+.dashboard-content {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  margin-top: 30px;
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #FFFDD0;
+  padding-bottom: 10px;
+}
+
+.user-section {
+  text-align: right;
+}
+
+.logout-button {
+  background: none;
+  color: #FFFDD0;
+  border: none;
+  cursor: pointer;
+  margin-right: 50px;
+  margin-left: 50px;
+}
+
+.tabs {
+  margin-top: 20px;
+}
+
+.tab-active {
+  background-color: #FFFDD0;
+  color: #000;
+  padding: 10px 20px;
+  border: none;
+  margin-right: 10px;
+  border-radius: 5px;
+}
+
+.tab {
+  background-color: #1B2E0C;
+  color: #FFFDD0;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+}
+
+.chart-container {
+  background-color: #f9f9dd;
+  padding: 10px;
+  margin-top: 0;
+  border-radius: 10px;
+  position: static;
+  flex: 1;
+}
+
+.chart-image {
+  width: 100%;
+  max-width: 800px;
+  display: block;
+  margin: 0 auto;
+}
+
+.refresh-button {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.side-menu {
+  position: static;
+  margin-left: 40px;
+  margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 220px;
+}
+
+.main-button {
+  background-color: #BC6C25;
+  color: #FFFDD0;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.dropdown label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.dropdown select {
+  padding: 5px;
+  border-radius: 5px;
+}
