@@ -8,7 +8,6 @@ import imagen7 from '../assets/imagen7.jpg';
 import { useNavigate } from 'react-router-dom';
 
 import GestionProductos from './gestion_productos';
-import Dashboard from './Dashboard';
 import { ListProd } from './lista_productos';
 
 export const Home: React.FC = () => {
@@ -31,9 +30,6 @@ export const Home: React.FC = () => {
                                 </li>
                                 <li className="nav-item">
                                     <a className="reusable-button" onClick={() => setView('lista')}>Lista de productos</a>
-                                </li>
-                                <li className="nav-item">
-                                    <a className="reusable-button" onClick={() => setView('dashboard')}>Acceder al visor</a>
                                 </li>
                             </ul>
                             <span className="navbar-text">
@@ -87,10 +83,6 @@ export const Home: React.FC = () => {
 
                     {view === 'gestion' && (
                         <GestionProductos onBack={() => setView('inicio')} />
-                    )}
-
-                    {view === 'dashboard' && (
-                        <Dashboard onBack={() => setView('inicio')} />
                     )}
 
                     {view === 'lista' && (
