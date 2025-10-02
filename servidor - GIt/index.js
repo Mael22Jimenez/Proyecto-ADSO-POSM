@@ -1,38 +1,84 @@
-const express = require("express"); 
-const app =express(); 
+const express = require("express");
+const app = express();
 const mysql = require("mysql")
 const cors = require("cors")
 
 app.use(cors())
 app.use(express.json())
 
+// Donde esta el servidor, toca cambiarlo cuando este Rails funcionando o se cree una forma de crear
+// la base de datos 
+
+
 const db = mysql.createConnection({
     host:"localhost",
     user:"root",
     password: "Mercurio2025",
     database: "posm_inventario"
-}); 
+});
 
-app.post("/create", (req,res)=>{
-    const id_planta = req.body.id_planta;
-    const especie = req.body.especie;
-    const siembra= req.body.siembra;
-    const fase = req.body.fase;
-    const estado = req.body.estado;
+// Agregar un item 
+
+app.post("/api/updateitem", (req,res)=>{
+    const id_Producto = req.body.idProducto;
+    const id_Categoria = req.body.idCategoria;
+    const nombre = req.body.nombre;
+    const descripcion = req.body.descripcion;
     const costo= req.body.costo;
+    const stock= req.body.stock;
+    const unidadMedida = req.body.unidadMedida;
+    const estado = req.body.estado;
+    const fechaRegistro = req.body.fechaRegistro;
     
-    db.query("INSERT INTO viver_planta(id_planta,Especie,Siembra,Fase,Estado,Costo) VALUES(?,?,?,?,?,?))",(id_planta,especie,siembra,fase,estado,costo),(err,result)=>{
+    
+    db.query("INSERT INTO Producto(idProducto,idCategoria,nombre,descripcion,precio,stock,unidad_medida,estado,fecha_registro) VALUES(?,?,?,?,?,?,?,?,?))",+
+        (id_Producto,id_Categoria,nombre,descripcion,costo,stock,unidadMedida,estado,fechaRegistro),(err,res)=>{
                         if(err){
                             console.log(err);
                         }else{
-                            res.send("Planta creada con exito"); 
+                            res.send("Objeto creada con exito"); 
                         }
                     }
                 );  
             });
 
-app.get("/read",(req,res)=>{
-    db.query("SELECT * FROM viver_planta", (err,result)=> {
+// Eliminar un producto
+
+app.delete("/api/delete/_id", (req,res) => {
+    const id = req.params.id;
+    db.query("DELETE FROM Producto WHERE id = ?"),(err,res)=>{
+                        if(err){
+                            console.log(err);
+                        }else{
+                            res.send("Objeto creada con exito"); 
+                        }}
+
+
+
+});
+
+//Añadir un movimiento
+
+app.post("api/updatemove", (req, res) => {
+    const producto = req.body.idProducto;
+    const tipo = req.body.tipo;
+    const cantidad = req.body.cantidad;
+    const proveedor = req.body.proveedor;
+
+    db.query("INSERT INTO MovimentoInventario(idProducto,tipo,cantidad,proveedor) VALUES(?,?,?,?))",+
+        (producto,tipo,cantidad,proveedor)),(err,res)=>{
+                        if(err){
+                            console.log(err);
+                        }else{
+                            res.send("Objeto creada con exito"); 
+                        }}
+});
+
+
+// Visualizar la tabla 
+
+app.get("/api/read",(req,res)=>{
+    db.query("SELECT * FROM Producto", (err,result)=> {
                         if(err){
                             console.log(err);
                         }else{
@@ -41,6 +87,24 @@ app.get("/read",(req,res)=>{
                     });
 });
 
-app.listen(3305, ()=>{
-    console.log("Puerto 3305")
-});
+//Log in 
+
+let UserData =prompt("Escriba su contraseña")
+
+app.get("/api/login", (req,res)=> [
+    Code = db.query("SELECT clave FROM Usuarios", (err,result)=> {
+                        if(err){
+                            console.log(err);
+                        }else{
+                            res.send(result); 
+                        }
+                    }) 
+]);
+
+const Check = UserData === Code; 
+
+
+//Puertos 
+
+const port = process.env.PORT || 3000
+app.listen(port, () => console.log('Lisenting on port'));
