@@ -12,6 +12,7 @@
   "type": "commonjs",
   "dependencies": {
     "morgan": "^1.10.1",
+    "mysql2": "^3.15.1",
     "nodemon": "^3.1.10",
     "promise-mysql": "^5.2.0",
     "save-dev": "^0.0.1-security"
