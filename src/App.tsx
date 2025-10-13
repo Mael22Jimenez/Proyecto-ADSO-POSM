@@ -4,20 +4,37 @@ import { useNavigate } from "react-router-dom";
 function App() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-
   const navigate = useNavigate();
 
-  const handleSubmit = () => {
-    console.log('Login attempt:', { username, password });
-     if (username === 'admin' && password === '123') {
-    navigate('/home');
-  } else {
-    alert('Credenciales incorrectas');
-  }
-};
+  // 🔥 Nueva función con conexión al backend
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
- 
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          usuario: username, // Debe coincidir con tu backend
+          clave: password,
+        }),
+      });
 
+      const data = await response.json();
+
+      if (data.login) {
+        alert(`✅ Bienvenido ${data.usuario.nombre}`);
+        navigate("/home");
+      } else {
+        alert(`❌ ${data.mensaje}`);
+      }
+    } catch (error) {
+      console.error("Error al conectar con el servidor:", error);
+      alert("⚠️ Error al conectar con el servidor");
+    }
+  };
+
+  // 🎨 Estilos
   const appContainerStyle: React.CSSProperties = {
     height: '100vh',
     width: '100vw',
@@ -44,21 +61,20 @@ function App() {
     height: '120px',
     backgroundColor: '#B6652C',
     borderRadius: '50%',
-    padding:4,
+    padding: 4,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'start',
     fontSize: '24px',
     marginBottom: '-60px',
-    border:'1px solid black' ,
+    border: '1px solid black',
     zIndex: 0,
     position: 'relative'
-    
   };
 
   const plantEmojiStyle: React.CSSProperties = {
     fontSize: '28px',
-    width:'8px',
+    width: '8px',
     filter: 'brightness(0.8)',
     display: 'flex'
   };
@@ -68,7 +84,7 @@ function App() {
     width: '320px',
     height: '50px',
     borderRadius: '8px',
-    border:'1px solid black' ,
+    border: '1px solid black',
     padding: '10px 40px',
     marginBottom: '1px',
     boxShadow: '0 8px 6px rgba(0, 0, 0, 0.2)',
@@ -87,11 +103,11 @@ function App() {
 
   const loginCardStyle: React.CSSProperties = {
     width: '480px',
-    height:'290px',
+    height: '290px',
     backgroundColor: '#556B2F',
     borderRadius: '20px',
     padding: '30px 40px 40px 40px',
-    border:'1px solid black' ,
+    border: '1px solid black',
     boxShadow: '0 4px 15px rgba(0, 0, 0, 0.3)',
     position: 'relative',
     marginTop: '-30px',
@@ -113,15 +129,15 @@ function App() {
   const inputIconStyle: React.CSSProperties = {
     position: 'absolute',
     borderRadius: '5px',
-    height:'100%',
-    width:'40px',
-    borderTopRightRadius:'1px',
+    height: '100%',
+    width: '40px',
+    borderTopRightRadius: '1px',
     borderBottomRightRadius: '0px',
-    margin:'-5px',
-    padding:'4px',
-    backgroundColor:'#B6652C' ,
-    border:'1px solid black',
-    top:'5px',
+    margin: '-5px',
+    padding: '4px',
+    backgroundColor: '#B6652C',
+    border: '1px solid black',
+    top: '5px',
     left: '41px',
     zIndex: 2,
     display: 'flex',
@@ -143,8 +159,8 @@ function App() {
     backgroundColor: '#D9903D',
     borderRadius: '6px',
     padding: '14px 16px 14px 45px',
-    border:'1px solid black' ,
-    marginLeft:'36px',
+    border: '1px solid black',
+    marginLeft: '36px',
     fontSize: '14px',
     color: '#2D4A1A',
     outline: 'none',
@@ -178,7 +194,7 @@ function App() {
     fontWeight: 'bold',
     letterSpacing: '1px',
     cursor: 'pointer',
-    border:'1px solid black' ,
+    border: '1px solid black',
     marginTop: '-10px',
     boxShadow: '0 2px 6px rgba(0, 0, 0, 0.2)',
     textTransform: 'uppercase',
@@ -189,30 +205,27 @@ function App() {
   return (
     <div style={appContainerStyle}>
       <div style={loginContainerStyle}>
-        {/* Círculo con planta */}
+        {/* Ícono circular */}
         <div style={plantIconStyle}>
-          <span style={plantEmojiStyle}><img 
-                src="/public/icon_login.png" 
-                alt="Planta" 
-                style={{width: '80px',height: '50px', marginLeft:'-20px', marginTop:'10px', opacity:0.6} as React.CSSProperties}
-                  /></span>
+          <span style={plantEmojiStyle}>
+            <img
+              src="/public/icon_login.png"
+              alt="Planta"
+              style={{ width: '80px', height: '50px', marginLeft: '-20px', marginTop: '10px', opacity: 0.6 } as React.CSSProperties}
+            />
+          </span>
         </div>
-        
-       
+
         <div style={headerContainerStyle}>
           <h1 style={headerTitleStyle}>INICIAR SESIÓN</h1>
         </div>
-        
+
         <div style={loginCardStyle}>
-          <div style={loginFormStyle}>
+          <form style={loginFormStyle} onSubmit={handleSubmit}>
             <div style={inputGroupStyle}>
               <div style={inputIconStyle}>
-                <img 
-                src="/public/icon_user.png" 
-                alt="Usuario" 
-                style={inputIconImageStyle}
-                  />
-                  </div>
+                <img src="/public/icon_user.png" alt="Usuario" style={inputIconImageStyle} />
+              </div>
               <input
                 type="text"
                 placeholder="Usuario"
@@ -221,16 +234,11 @@ function App() {
                 style={inputFieldStyle}
               />
             </div>
-            
+
             <div style={inputGroupStyle}>
-              <div style={inputIconStyle}> 
-                <img 
-                src="/public/icon_cont.png" 
-                alt="Contraseña" 
-                style={inputIconImageStyle}
-                  />
-                   </div>
-                 
+              <div style={inputIconStyle}>
+                <img src="/public/icon_cont.png" alt="Contraseña" style={inputIconImageStyle} />
+              </div>
               <input
                 type="password"
                 placeholder="Contraseña"
@@ -239,9 +247,9 @@ function App() {
                 style={inputFieldStyle}
               />
             </div>
-            
+
             <div style={forgotPasswordStyle}>
-              <a 
+              <a
                 href="#"
                 style={forgotLinkStyle}
                 onClick={(e) => {
@@ -260,9 +268,9 @@ function App() {
                 Olvidé la contraseña
               </a>
             </div>
-            
-            <button 
-              onClick={handleSubmit} 
+
+            <button
+              type="submit"
               style={loginButtonStyle}
               onMouseEnter={(e) => {
                 const target = e.target as HTMLButtonElement;
@@ -277,16 +285,15 @@ function App() {
             >
               LOGIN
             </button>
-          </div>
+          </form>
         </div>
       </div>
-      
+
       <style>{`
         input::placeholder {
           color: #070606 !important;
           opacity: 0.5 !important;
         }
-        
         input:focus::placeholder {
           opacity: 0.5 !important;
         }
