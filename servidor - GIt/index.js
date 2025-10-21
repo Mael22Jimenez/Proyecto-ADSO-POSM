@@ -36,7 +36,7 @@ app.post("/api/updateitem", (req,res)=>{
                         if(err){
                             console.log(err);
                         }else{
-                            res.send("Objeto creada con exito"); 
+                            res.send("Objeto creado con exito"); 
                         }
                     }
                 );  
@@ -50,7 +50,7 @@ app.delete("/api/delete/_id", (req,res) => {
                         if(err){
                             console.log(err);
                         }else{
-                            res.send("Objeto creada con exito"); 
+                            res.send("Objeto eliminado con exito"); 
                         }}
 
 
@@ -70,10 +70,48 @@ app.post("api/updatemove", (req, res) => {
                         if(err){
                             console.log(err);
                         }else{
-                            res.send("Objeto creada con exito"); 
+                            res.send("Movimiento creado con exito"); 
                         }}
 });
 
+
+// Añadir un proveedor
+app.post("/api/updateitem", (req,res)=>{
+    const id_Proveedor = req.body.idProveedor;
+    const nombre = req.body.nombre;
+    const contacto = req.body.contacto;
+    const telefono= req.body.telefono;
+    const correo= req.body.correo;
+    const direccion = req.body.direccion;
+
+    
+    
+    db.query("INSERT INTO Proveedor(idProveedor,nombre,contacto,telefono,correo,direccion) VALUES(?,?,?,?,?,?))",+
+        (id_Proveedor,nombre,contacto,telefono,correo,direccion),(err,res)=>{
+                        if(err){
+                            console.log(err);
+                        }else{
+                            res.send("Proveedor creado con exito"); 
+                        }
+                    }
+                );  
+            });
+
+
+// Eliminar un proveedor
+
+app.delete("/api/delete/_id", (req,res) => {
+    const id = req.params.id;
+    db.query("DELETE FROM Proveedor WHERE id = ?"),(err,res)=>{
+                        if(err){
+                            console.log(err);
+                        }else{
+                            res.send("Proveedor eliminado con exito"); 
+                        }}
+
+
+
+});
 
 // Visualizar la tabla 
 
