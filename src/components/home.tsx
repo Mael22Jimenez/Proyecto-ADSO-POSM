@@ -8,7 +8,7 @@ import imagen7 from '../assets/imagen7.jpg';
 import { useNavigate } from 'react-router-dom';
 
 import GestionProductos from './gestion_productos';
-import { ListProd } from './lista_productos';
+import ListaProductos from "./lista_productos";
 
 export const Home: React.FC = () => {
     const navigate = useNavigate();
@@ -86,7 +86,7 @@ export const Home: React.FC = () => {
                     )}
 
                     {view === 'lista' && (
-                        <ListProd onBack={() => setView('inicio')} />
+                        <ListaProductos onBack={() => setView('inicio')} />
                     )}
                 </div>
             </div>

@@ -1,97 +1,170 @@
-// Importar dependencias
-require("dotenv").config(); // Carga variables desde .env
+// --------------------------------------
+// ✅ DEPENDENCIAS
+// --------------------------------------
+require("dotenv").config();
 const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
 
 const app = express();
+const PORT = process.env.PORT || 3305;
 
-// Middleware
-app.use(cors({
-    origin: "http://localhost:5173", //URL del frontend
+// --------------------------------------
+// ✅ MIDDLEWARES
+// --------------------------------------
+app.use(
+  cors({
+    origin: "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true
-}));
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Conexión con MySQL (Clever Cloud)
+// --------------------------------------
+// ✅ CONEXIÓN MYSQL
+// --------------------------------------
 const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT,
 });
 
-// Verificar conexión
 db.connect((err) => {
+  if (err) {
+    console.error("❌ Error al conectar MySQL:", err);
+  } else {
+    console.log("✅ Conectado correctamente a la base de datos");
+  }
+});
+
+// --------------------------------------
+// ✅ ENDPOINTS
+// --------------------------------------
+
+// 🔹 Verificación rápida
+app.get("/healthz", (req, res) => res.send("ok"));
+
+// 🔹 Obtener categorías
+app.get("/api/categorias", (req, res) => {
+  const query = "SELECT idCategoria, nombre FROM Categoria";
+  db.query(query, (err, results) => {
     if (err) {
-        console.error("❌ Error al conectar con la base de datos:", err);
-        return;
+      console.error("❌ Error al obtener categorías:", err);
+      return res.status(500).json({ error: "Error al obtener categorías" });
     }
-    console.log("✅ Conexión exitosa a la base de datos");
+    res.json(results);
+  });
 });
 
-// Endpoint: Crear planta
-app.post("/create", (req, res) => {
-    const { id_planta, especie, siembra, fase, estado, costo } = req.body;
+// 🔹 Registrar producto o planta
+app.post("/api/guardar-producto", (req, res) => {
+  const { categoria, nombre, tipo, estado, fecha_siembra, ubicacion, costo, descripcion } = req.body;
 
-    const query = "INSERT INTO viver_planta (id_planta, Especie, Siembra, Fase, Estado, Costo) VALUES (?, ?, ?, ?, ?, ?)";
-    const values = [id_planta, especie, siembra, fase, estado, costo];
+  if (!categoria || !nombre) {
+    return res.status(400).json({ mensaje: "Faltan datos requeridos" });
+  }
 
-    db.query(query, values, (err, result) => {
-        if (err) {
-            console.error("Error al insertar planta:", err);
-            res.status(500).send("Error en el servidor");
-        } else {
-            res.send("🌱 Planta creada con éxito");
+  // Si es planta, registrar en Planta + Producto
+  if (categoria.toLowerCase().includes("planta")) {
+    const insertProducto = `
+      INSERT INTO Producto (idCategoria, nombre, descripcion, precio, stock, unidad_medida, fecha_registro)
+      VALUES ((SELECT idCategoria FROM Categoria WHERE nombre = ? LIMIT 1), ?, ?, ?, 0, 'unidad', NOW())
+    `;
+    db.query(insertProducto, [categoria, nombre, descripcion, costo], (err, result) => {
+      if (err) {
+        console.error("❌ Error al guardar producto base:", err);
+        return res.status(500).json({ mensaje: "Error al guardar producto base" });
+      }
+
+      const idProducto = result.insertId;
+      const insertPlanta = `
+        INSERT INTO Planta (idProducto, nombre, tipo, estado, fecha_siembra, ubicacion)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `;
+      db.query(insertPlanta, [idProducto, nombre, tipo, estado, fecha_siembra, ubicacion], (err2) => {
+        if (err2) {
+          console.error("❌ Error al guardar planta:", err2);
+          return res.status(500).json({ mensaje: "Error al guardar planta" });
         }
+        res.json({ mensaje: "🌱 Planta registrada con éxito" });
+      });
     });
-});
-
-// Endpoint: Leer plantas
-app.get("/read", (req, res) => {
-    db.query("SELECT * FROM viver_planta", (err, result) => {
-        if (err) {
-            console.error("Error al obtener plantas:", err);
-            res.status(500).send("Error en el servidor");
-        } else {
-            res.send(result);
-        }
+  } else {
+    // Si es otro tipo de producto
+    const insertProducto = `
+      INSERT INTO Producto (idCategoria, nombre, descripcion, precio, stock, unidad_medida, fecha_registro)
+      VALUES ((SELECT idCategoria FROM Categoria WHERE nombre = ? LIMIT 1), ?, ?, ?, 0, 'unidad', NOW())
+    `;
+    db.query(insertProducto, [categoria, nombre, descripcion, costo], (err) => {
+      if (err) {
+        console.error("❌ Error al guardar producto:", err);
+        return res.status(500).json({ mensaje: "Error al guardar producto" });
+      }
+      res.json({ mensaje: "📦 Producto registrado con éxito" });
     });
+  }
 });
 
-// Iniciar servidor
-const PORT = process.env.PORT || 3305;
-app.listen(PORT, () => {
-    console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
+// 🔹 Obtener lista de productos con categoría
+app.get("/api/productos", (req, res) => {
+  const query = `
+    SELECT p.idProducto, p.nombre, p.descripcion, p.precio, p.stock, c.nombre AS categoria
+    FROM Producto p
+    INNER JOIN Categoria c ON p.idCategoria = c.idCategoria
+    ORDER BY p.idProducto DESC
+  `;
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("❌ Error al obtener productos:", err);
+      return res.status(500).json({ mensaje: "Error al obtener productos" });
+    }
+    res.json(results);
+  });
 });
-
-// Endpoint: Login de usuario
+// ✅ Endpoint: Login de usuario
 app.post("/login", (req, res) => {
   const { usuario, clave } = req.body;
 
   if (!usuario || !clave) {
-    return res.status(400).json({ login: false, mensaje: "Faltan campos obligatorios" });
+    return res.status(400).json({
+      login: false,
+      mensaje: "Faltan campos obligatorios",
+    });
   }
 
   const query = `
     SELECT idUsuario, nombre, apellido, correo, estado, idRol
-    FROM  \`Usuario\`
+    FROM Usuario
     WHERE usuario = ? AND clave = ? AND estado = 'Activo'
   `;
 
   db.query(query, [usuario, clave], (err, result) => {
     if (err) {
       console.error("❌ Error al autenticar usuario:", err);
-      return res.status(500).json({ login: false, mensaje: "Error del servidor" });
+      return res.status(500).json({
+        login: false,
+        mensaje: "Error del servidor",
+      });
     }
 
     if (result.length > 0) {
       res.json({ login: true, usuario: result[0] });
     } else {
-      res.json({ login: false, mensaje: "Usuario o contraseña incorrectos o inactivo" });
+      res.json({
+        login: false,
+        mensaje: "Usuario o contraseña incorrectos o inactivo",
+      });
     }
   });
+});
+
+// --------------------------------------
+// 🚀 ARRANQUE DEL SERVIDOR
+// --------------------------------------
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });
