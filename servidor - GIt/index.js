@@ -109,22 +109,34 @@ app.post("/api/guardar-producto", (req, res) => {
   }
 });
 
-// 🔹 Obtener lista de productos con categoría
+// 🔹 Obtener productos y plantas con precio y descripción combinada
 app.get("/api/productos", (req, res) => {
   const query = `
-    SELECT p.idProducto, p.nombre, p.descripcion, p.precio, p.stock, c.nombre AS categoria
+    SELECT 
+      p.idProducto AS id,
+      p.nombre,
+      c.nombre AS categoria,
+      COALESCE(
+        NULLIF(p.descripcion, ''),
+        CONCAT('Tipo: ', pl.tipo, ', Estado: ', pl.estado, ', Ubicación: ', pl.ubicacion)
+      ) AS descripcion,
+      p.precio,
+      p.stock
     FROM Producto p
     INNER JOIN Categoria c ON p.idCategoria = c.idCategoria
-    ORDER BY p.idProducto DESC
+    LEFT JOIN Planta pl ON p.idProducto = pl.idProducto
+    ORDER BY p.idProducto DESC;
   `;
+
   db.query(query, (err, results) => {
     if (err) {
       console.error("❌ Error al obtener productos:", err);
-      return res.status(500).json({ mensaje: "Error al obtener productos" });
+      return res.status(500).json({ error: "Error al obtener productos" });
     }
     res.json(results);
   });
 });
+
 // ✅ Endpoint: Login de usuario
 app.post("/login", (req, res) => {
   const { usuario, clave } = req.body;

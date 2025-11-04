@@ -9,8 +9,10 @@ interface Producto {
   stock: number;
   categoria: string;
 }
-
-const ListaProductos: React.FC = () => {
+interface Props {
+  onBack: () => void;
+}
+const ListaProductos: React.FC<Props> = ({ onBack }) => {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [busqueda, setBusqueda] = useState("");
 
@@ -32,6 +34,9 @@ const ListaProductos: React.FC = () => {
   return (
     <div className="lista-prod-container">
       <header className="header">
+        <button className="reusable-button mb-3" onClick={onBack}>
+          ⬅️ Volver
+        </button>
         <h3>📋 LISTA DE PRODUCTOS</h3>
       </header>
 
