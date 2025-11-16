@@ -12,8 +12,15 @@ interface Categoria {
 
 const GestionProductos: React.FC<Props> = ({ onBack }) => {
   // Estado para categorías
+  const [tipoMovimiento, setTipoMovimiento] = useState("");
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("");
+  const [cantidad, setCantidad] = useState("");
+  const [productos, setProductos] = useState([]);
+  const [productoSeleccionado, setProductoSeleccionado] = useState("");
+  const productosFiltrados = productos.filter(
+    (p) => p.categoria === categoriaSeleccionada
+  );
 
   // Estado para el formulario de producto/planta
   const [nuevoProducto, setNuevoProducto] = useState({
@@ -34,12 +41,37 @@ const GestionProductos: React.FC<Props> = ({ onBack }) => {
       .catch((err) => console.error("❌ Error al cargar categorías:", err));
   }, []);
 
+  // CARGAR PRODUCTOS PARA LAS SALIDAS
+  useEffect(() => {
+    fetch("http://localhost:3305/api/productos")
+      .then((res) => res.json())
+      .then((data) => setProductos(data))
+      .catch((err) => console.error("❌ Error al cargar productos:", err));
+  }, []);
+
   // Manejar cambios en el formulario
   const handleProductoChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { id, value } = e.target;
     setNuevoProducto({ ...nuevoProducto, [id]: value });
+  };
+    const handleSeleccionProducto = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const id = e.target.value;
+    setProductoSeleccionado(id);
+
+    const prod = productos.find((p) => p.idProducto == id);
+    if (!prod) return;
+
+    setNuevoProducto({
+      nombre: prod.nombre,
+      tipo: prod.tipo || "",
+      estado: prod.estado || "Semilla",
+      fecha_siembra: prod.fecha_siembra || "",
+      ubicacion: prod.ubicacion || "",
+      costo: prod.precio,
+      descripcion: "",
+    });
   };
 
   // Función para crear producto o planta
@@ -48,8 +80,14 @@ const GestionProductos: React.FC<Props> = ({ onBack }) => {
       alert("Por favor completa los campos requeridos.");
       return;
     }
+    // Validar cantidad
+    if (!cantidad || parseInt(cantidad) <= 0) {
+    alert("Debe ingresar una cantidad válida.");
+    return;
+    }
 
     const datos = {
+      idProducto: productoSeleccionado,
       categoria: categoriaSeleccionada,
       nombre: nuevoProducto.nombre,
       tipo: nuevoProducto.tipo,
@@ -58,6 +96,8 @@ const GestionProductos: React.FC<Props> = ({ onBack }) => {
       ubicacion: nuevoProducto.ubicacion,
       costo: nuevoProducto.costo,
       descripcion: nuevoProducto.descripcion,
+      tipoMovimiento: tipoMovimiento,
+      cantidad: cantidad,
     };
 
     try {
@@ -104,28 +144,60 @@ const GestionProductos: React.FC<Props> = ({ onBack }) => {
       </div>
 
       <br />
-
-      {/* Selección de categoría */}
+      {/* Selección de tipo de movimiento */}
       <div className="input-group mb-4" style={{ width: "50%" }}>
-        <span className="input-group-text">Categoría</span>
+        <span className="input-group-text">Movimiento</span>
         <select
           className="form-select"
-          value={categoriaSeleccionada}
-          onChange={(e) => setCategoriaSeleccionada(e.target.value)}
+          value={tipoMovimiento}
+          onChange={(e) => setTipoMovimiento(e.target.value)}
         >
-          <option value="">Seleccione una categoría</option>
-          {categorias.map((c) => (
-            <option key={c.idCategoria} value={c.nombre}>
-              {c.nombre}
-            </option>
-          ))}
+          <option value="">Seleccione un tipo de movimiento</option>
+          <option value="Entrada">Entrada (sumar stock)</option>
+          <option value="Salida">Salida (restar stock)</option>
         </select>
       </div>
+      {/* Selección de categoría */}
+      {tipoMovimiento && (
+        <div className="input-group mb-4" style={{ width: "50%" }}>
+          <span className="input-group-text">Categoría</span>
+          <select
+            className="form-select"
+            value={categoriaSeleccionada}
+            onChange={(e) => setCategoriaSeleccionada(e.target.value)}
+          >
+            <option value="">Seleccione una categoría</option>
+            {categorias.map((c) => (
+              <option key={c.idCategoria} value={c.nombre}>
+                {c.nombre}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+      {/* MOSTRAR SOLO SI ES SALIDA */}
+      {tipoMovimiento === "Salida" && (
+        <div className="input-group mb-4" style={{ width: "50%" }}>
+          <span className="input-group-text">Producto</span>
+          <select
+            className="form-select"
+            value={productoSeleccionado}
+            onChange={handleSeleccionProducto}
+          >
+            <option value="">Seleccione un producto</option>
+            {productosFiltrados.map((p) => (
+              <option key={p.idProducto} value={p.idProducto}>
+                {p.nombre} (Stock: {p.stock})
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* Formulario dinámico según la categoría */}
-      {categoriaSeleccionada && (
-        <div className="d-flex justify-content-start align-items-start gap-5">
-          {categoriaSeleccionada.toLowerCase().includes("planta") ? (
+      {tipoMovimiento && categoriaSeleccionada && (
+          <div className="d-flex justify-content-start align-items-start gap-5">
+            {categoriaSeleccionada.toLowerCase().includes("planta") ? (
             // 🌱 Formulario de planta
             <form className="w-50">
               <h5>Registrar Planta</h5>
@@ -138,6 +210,7 @@ const GestionProductos: React.FC<Props> = ({ onBack }) => {
                   className="form-control"
                   value={nuevoProducto.nombre}
                   onChange={handleProductoChange}
+                  readOnly={tipoMovimiento === "Salida"} //Bloqueo si es salida
                 />
               </div>
 
@@ -149,6 +222,7 @@ const GestionProductos: React.FC<Props> = ({ onBack }) => {
                   className="form-control"
                   value={nuevoProducto.tipo}
                   onChange={handleProductoChange}
+                  readOnly={tipoMovimiento === "Salida"} //Bloqueo si es salida
                 />
               </div>
 
@@ -159,6 +233,7 @@ const GestionProductos: React.FC<Props> = ({ onBack }) => {
                   className="form-select"
                   value={nuevoProducto.estado}
                   onChange={handleProductoChange}
+                  disabled={tipoMovimiento === "Salida"} //Bloqueo si es salida
                 >
                   <option value="Semilla">Semilla</option>
                   <option value="Crecimiento">Crecimiento</option>
@@ -175,6 +250,7 @@ const GestionProductos: React.FC<Props> = ({ onBack }) => {
                   className="form-control"
                   value={nuevoProducto.fecha_siembra}
                   onChange={handleProductoChange}
+                  disabled={tipoMovimiento === "Salida"} //Bloqueo si es salida
                 />
               </div>
 
@@ -186,6 +262,7 @@ const GestionProductos: React.FC<Props> = ({ onBack }) => {
                   className="form-control"
                   value={nuevoProducto.ubicacion}
                   onChange={handleProductoChange}
+                  readOnly={tipoMovimiento === "Salida"} //Bloqueo si es salida
                 />
               </div>
 
@@ -197,6 +274,18 @@ const GestionProductos: React.FC<Props> = ({ onBack }) => {
                   className="form-control"
                   value={nuevoProducto.costo}
                   onChange={handleProductoChange}
+                  readOnly={tipoMovimiento === "Salida"} //Bloqueo si es salida
+                />
+              </div>
+
+              <div className="input-group mb-3">
+                <span className="input-group-text">Cantidad</span>
+                <input
+                  type="number"
+                  id="cantidad"
+                  className="form-control"
+                  value={cantidad}
+                  onChange={(e) => setCantidad(e.target.value)}
                 />
               </div>
 
@@ -232,7 +321,9 @@ const GestionProductos: React.FC<Props> = ({ onBack }) => {
               </div>
 
               <div className="input-group mb-3">
-                <span className="input-group-text">Descripción</span>
+                <span className="input-group-text">
+                  {tipoMovimiento === "Salida" ? "Motivo de salida" : "Descripción"}
+                </span>
                 <textarea
                   id="descripcion"
                   className="form-control"
@@ -240,6 +331,18 @@ const GestionProductos: React.FC<Props> = ({ onBack }) => {
                   onChange={handleProductoChange}
                   rows={2}
                 ></textarea>
+              </div>
+
+              <div className="input-group mb-3">
+                <span className="input-group-text">Cantidad</span>
+                <input
+                  type="number"
+                  id="cantidad"
+                  className="form-control"
+                  value={cantidad}
+                  min="1"
+                  onChange={(e) => setCantidad(e.target.value)}
+                />
               </div>
 
               <button type="button" className="reusable-button p-2 mt-3" onClick={crearProducto}>

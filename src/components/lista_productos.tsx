@@ -12,6 +12,57 @@ interface Producto {
 interface Props {
   onBack: () => void;
 }
+// 🗑 ELIMINAR PRODUCTO
+const eliminarProducto = async (id: number) => {
+  if (!confirm("¿Seguro que deseas eliminar este producto?")) return;
+
+  try {
+    const res = await fetch(`http://localhost:3305/api/productos/${id}`, {
+      method: "DELETE",
+    });
+
+    const data = await res.json();
+
+    alert(data.mensaje);
+
+    // recargar lista
+    setProductos(productos.filter(p => p.idProducto !== id));
+  } catch (err) {
+    console.error(err);
+    alert("Error al eliminar producto");
+  }
+};
+
+// ✏️ EDITAR PRODUCTO
+const editarProducto = (producto: Producto) => {
+  const nuevoNombre = prompt("Nuevo nombre:", producto.nombre);
+  const nuevoPrecio = prompt("Nuevo precio:", producto.precio.toString());
+
+  if (!nuevoNombre || !nuevoPrecio) return;
+
+  fetch(`http://localhost:3305/api/productos/${producto.idProducto}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      nombre: nuevoNombre,
+      precio: nuevoPrecio
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      alert(data.mensaje);
+
+      // actualizar visualmente
+      setProductos((prev) =>
+        prev.map((p) =>
+          p.idProducto === producto.idProducto
+            ? { ...p, nombre: nuevoNombre, precio: Number(nuevoPrecio) }
+            : p
+        )
+      );
+    })
+    .catch(() => alert("Error al actualizar el producto"));
+};
 const ListaProductos: React.FC<Props> = ({ onBack }) => {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [busqueda, setBusqueda] = useState("");
@@ -60,6 +111,8 @@ const ListaProductos: React.FC<Props> = ({ onBack }) => {
             <th>Descripción</th>
             <th>Precio</th>
             <th>Stock</th>
+            <th>Editar</th>
+            <th>Eliminar</th>
           </tr>
         </thead>
         <tbody>
@@ -72,6 +125,23 @@ const ListaProductos: React.FC<Props> = ({ onBack }) => {
                 <td>{p.descripcion || "—"}</td>
                 <td className="text-end">${p.precio?.toLocaleString()}</td>
                 <td className="text-center">{p.stock}</td>
+                <td>
+                  <button
+                    className="btn btn-warning btn-sm"
+                    onClick={() => editarProducto(p)}
+                  >
+                    ✏️ Editar
+                  </button>
+                </td>
+
+                <td>
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => eliminarProducto(p.idProducto)}
+                  >
+                    🗑 Eliminar
+                  </button>
+                </td>
               </tr>
             ))
           ) : (
