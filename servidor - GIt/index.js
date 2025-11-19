@@ -1,6 +1,6 @@
-// --------------------------------------
-// ✅ DEPENDENCIAS
-// --------------------------------------
+
+// Dependencias
+
 require("dotenv").config();
 const express = require("express");
 const mysql = require("mysql2");
@@ -9,9 +9,9 @@ const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 3305;
 
-// --------------------------------------
-// ✅ MIDDLEWARES
-// --------------------------------------
+
+// Intermediarios
+
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -22,9 +22,9 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// --------------------------------------
-// ✅ CONEXIÓN MYSQL
-// --------------------------------------
+
+// Conexion MYSQL
+
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -41,14 +41,12 @@ db.connect((err) => {
   }
 });
 
-// --------------------------------------
-// ✅ ENDPOINTS
-// --------------------------------------
+// Endpoints
 
-// 🔹 Verificación rápida
+// Verificación rápida
 app.get("/healthz", (req, res) => res.send("ok"));
 
-// 🔹 Obtener categorías
+// Obtener categorías
 app.get("/api/categorias", (req, res) => {
   const query = "SELECT idCategoria, nombre FROM Categoria";
   db.query(query, (err, results) => {
@@ -67,16 +65,15 @@ app.post("/api/guardar-producto", (req, res) => {
     return res.status(400).json({ mensaje: "Faltan datos requeridos" });
   }
 
-  // ==========================================================
-  // 🚀 1) SI ES UNA SALIDA (solo restar stock)
-  // ==========================================================
+  // Si es una salida (solo restar stock)
+
   if (tipoMovimiento === "Salida") {
 
     if (!idProducto) {
       return res.status(400).json({ mensaje: "Debe seleccionar un producto para salida." });
     }
 
-    // 1️⃣ Consultar stock actual
+    // Consultar stock actual
     const consultaStock = "SELECT stock FROM Producto WHERE idProducto = ?";
 
     db.query(consultaStock, [idProducto], (errS, rows) => {
@@ -97,7 +94,7 @@ app.post("/api/guardar-producto", (req, res) => {
         });
       }
 
-      // 2️⃣ Restar stock
+      // Restar stock
       const updateStock = `
         UPDATE Producto
         SET stock = stock - ?
@@ -110,7 +107,7 @@ app.post("/api/guardar-producto", (req, res) => {
           return res.status(500).json({ mensaje: "Error al actualizar stock" });
         }
 
-        // 3️⃣ Registrar movimiento
+        //Registrar movimiento
         const insertMovimiento = `
           INSERT INTO MovimientoInventario (idProducto, tipo, cantidad, fecha, observacion)
           VALUES (?, ?, ?, NOW(), ?)
@@ -124,12 +121,11 @@ app.post("/api/guardar-producto", (req, res) => {
       });
     });
 
-    return; // finaliza aquí
+    return;
   }
 
-  // ==========================================================
-  // 🚀 2) SI ES UNA ENTRADA (crear producto o planta)
-  // ==========================================================
+  //Si es una entrada (crear producto o planta)
+
   if (!categoria || !nombre) {
     return res.status(400).json({ mensaje: "Faltan datos para crear producto" });
   }
@@ -179,7 +175,7 @@ app.post("/api/guardar-producto", (req, res) => {
   });
 });
 
-// 🔹 Obtener productos y plantas con precio y descripción combinada
+//Obtener productos y plantas con precio y descripción combinada
 app.get("/api/productos", (req, res) => {
   const query = `
     SELECT 
@@ -207,7 +203,8 @@ app.get("/api/productos", (req, res) => {
   });
 });
 
-// ✅ Endpoint: Login de usuario
+//Endpoint: Login de usuario
+
 app.post("/login", (req, res) => {
   const { usuario, clave } = req.body;
 
@@ -243,7 +240,8 @@ app.post("/login", (req, res) => {
     }
   });
 });
-// 🔹 Eliminar producto por ID
+//Eliminar producto por ID
+
 app.delete("/api/productos/:id", (req, res) => {
   const { id } = req.params;
 
@@ -259,7 +257,7 @@ app.delete("/api/productos/:id", (req, res) => {
   });
 });
 
-// 🔥 EDITAR PRODUCTO POR ID
+//Editar producto por ID
 app.put("/api/productos/:id", (req, res) => {
   const { id } = req.params;
   const { nombre, precio } = req.body;
@@ -280,9 +278,8 @@ app.put("/api/productos/:id", (req, res) => {
   });
 });
 
-// --------------------------------------
 // 🚀 ARRANQUE DEL SERVIDOR
-// --------------------------------------
+
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });

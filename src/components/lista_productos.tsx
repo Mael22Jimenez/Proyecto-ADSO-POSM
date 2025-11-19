@@ -12,7 +12,7 @@ interface Producto {
 interface Props {
   onBack: () => void;
 }
-// 🗑 ELIMINAR PRODUCTO
+// Eliminar producto
 const eliminarProducto = async (id: number) => {
   if (!confirm("¿Seguro que deseas eliminar este producto?")) return;
 
@@ -33,7 +33,7 @@ const eliminarProducto = async (id: number) => {
   }
 };
 
-// ✏️ EDITAR PRODUCTO
+// Editar producto
 const editarProducto = (producto: Producto) => {
   const nuevoNombre = prompt("Nuevo nombre:", producto.nombre);
   const nuevoPrecio = prompt("Nuevo precio:", producto.precio.toString());
@@ -67,7 +67,7 @@ const ListaProductos: React.FC<Props> = ({ onBack }) => {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [busqueda, setBusqueda] = useState("");
 
-  // 🔹 Cargar lista de productos desde el backend
+  // Cargar lista de productos desde el backend
   useEffect(() => {
     fetch("http://localhost:3305/api/productos")
       .then((res) => res.json())
@@ -75,7 +75,7 @@ const ListaProductos: React.FC<Props> = ({ onBack }) => {
       .catch((err) => console.error("❌ Error al cargar productos:", err));
   }, []);
 
-  // 🔍 Filtrar productos por nombre o categoría
+  // Filtrar productos por nombre o categoría
   const productosFiltrados = productos.filter(
     (p) =>
       p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||

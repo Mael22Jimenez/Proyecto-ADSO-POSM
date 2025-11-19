@@ -41,7 +41,7 @@ const GestionProductos: React.FC<Props> = ({ onBack }) => {
       .catch((err) => console.error("❌ Error al cargar categorías:", err));
   }, []);
 
-  // CARGAR PRODUCTOS PARA LAS SALIDAS
+  // Cargar productos para las salidas
   useEffect(() => {
     fetch("http://localhost:3305/api/productos")
       .then((res) => res.json())
@@ -175,7 +175,7 @@ const GestionProductos: React.FC<Props> = ({ onBack }) => {
           </select>
         </div>
       )}
-      {/* MOSTRAR SOLO SI ES SALIDA */}
+      {/* Mostrar solo si es salida */}
       {tipoMovimiento === "Salida" && (
         <div className="input-group mb-4" style={{ width: "50%" }}>
           <span className="input-group-text">Producto</span>
@@ -294,7 +294,7 @@ const GestionProductos: React.FC<Props> = ({ onBack }) => {
               </button>
             </form>
           ) : (
-            // 📦 Formulario de producto general
+            // Formulario de producto general
             <form className="w-50">
               <h5>Registrar Producto</h5>
 

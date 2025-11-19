@@ -6,7 +6,7 @@ function App() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  // 🔥 Nueva función con conexión al backend
+  //Nueva función con conexión al backend
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -15,7 +15,7 @@ function App() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          usuario: username, // Debe coincidir con tu backend
+          usuario: username, // Debe coincidir con el backend
           clave: password,
         }),
       });
@@ -34,7 +34,7 @@ function App() {
     }
   };
 
-  // 🎨 Estilos
+  //Estilos
   const appContainerStyle: React.CSSProperties = {
     height: '100vh',
     width: '100vw',
