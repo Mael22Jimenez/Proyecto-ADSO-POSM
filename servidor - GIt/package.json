@@ -21,6 +21,9 @@
     "promise-mysql": "^5.2.0",
     "save-dev": "^0.0.1-security",
     "serve": "^14.2.0"
-  }
+  },
+  "devDependencies": {
+    "vite": "^6.3.5"
+
   
 }
