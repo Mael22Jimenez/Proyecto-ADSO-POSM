@@ -278,8 +278,8 @@ app.put("/api/productos/:id", (req, res) => {
   });
 });
 
-// 🚀 ARRANQUE DEL SERVIDOR
+// 🚀 ARRANQUE DEL SERVIDOR - Servidor de Render
 
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Servidor corriendo en puerto ${PORT}`);
 });
