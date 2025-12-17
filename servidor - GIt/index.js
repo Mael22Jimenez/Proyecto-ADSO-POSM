@@ -280,6 +280,6 @@ app.put("/api/productos/:id", (req, res) => {
 
 // 🚀 ARRANQUE DEL SERVIDOR - Servidor de Render
 
-app.listen(PORT, "/0.0.0.0", () => {
+app.listen(PORT, "74.220.48.0/24", () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
 });
