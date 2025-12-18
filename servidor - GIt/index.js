@@ -286,3 +286,10 @@ app.put("/api/productos/:id", (req, res) => {
 app.get("/", (req, res) => {
   res.send("Hola Render");
 });
+
+// 🚀 ARRANQUE DEL SERVIDOR
+const SERVER_PORT = process.env.PORT || 3000; // Cambiar a 3000, no 3306
+
+app.listen(SERVER_PORT, '0.0.0.0', () => {
+  console.log(`🚀 Servidor corriendo en puerto ${SERVER_PORT}`);
+});
