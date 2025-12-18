@@ -36,6 +36,13 @@ const db = mysql.createConnection({
   }
 });
 
+console.log('🔍 Verificando variables de entorno:');
+console.log('DB_HOST:', process.env.DB_HOST ? '✅ Configurado' : '❌ Falta');
+console.log('DB_USER:', process.env.DB_USER ? '✅ Configurado' : '❌ Falta');
+console.log('DB_PASSWORD:', process.env.DB_PASSWORD ? '✅ Configurado' : '❌ Falta');
+console.log('DB_NAME:', process.env.DB_NAME ? '✅ Configurado' : '❌ Falta');
+console.log('DB_PORT:', process.env.DB_PORT || '3306 (default)')
+
 db.connect((err) => {
   if (err) {
     console.error("❌ Error al conectar MySQL:", err);
