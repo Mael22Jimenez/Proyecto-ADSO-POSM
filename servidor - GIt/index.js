@@ -283,9 +283,3 @@ app.put("/api/productos/:id", (req, res) => {
 app.get("/", (req, res) => {
   res.send("Hola Render");
 });
-
-// Escuchar en 0.0.0.0 
-
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
-});
