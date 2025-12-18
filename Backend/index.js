@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 3306;
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://tu-frontend.onrender.com", // ← Pon la URL de tu frontend
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
