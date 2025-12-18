@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 
+console.log('🔍 API URL:', import.meta.env.VITE_API_URL);
+console.log('🔍 Todas las variables:', import.meta.env);
+
 function App() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
